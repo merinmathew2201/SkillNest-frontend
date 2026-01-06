@@ -1,4 +1,23 @@
 @import "tailwindcss";
 *{
-    font-family: "Libre Baskerville", serif;
+    font-family: "Montserrat", sans-serif;
+}
+.infinite-scroll {
+  display: flex;
+  width: max-content;
+  animation: scroll-left 25s linear infinite;
+}
+
+.infinite-scroll:hover,
+.infinite-scroll:active {
+  animation-play-state: paused;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
