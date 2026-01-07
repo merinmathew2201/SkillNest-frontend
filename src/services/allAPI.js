@@ -6,3 +6,8 @@ import serverURL from "./serverURL"
 export const registerAPI = async(reqBody)=>{
     return await commonAPI("POST",`${serverURL}/register`,reqBody)
 }
+
+// login api-called by auth component,when login btn clicked
+export const loginAPI = async(reqBody)=>{
+    return await commonAPI("POST",`${serverURL}/login`,reqBody)
+}

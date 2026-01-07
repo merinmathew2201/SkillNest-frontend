@@ -4,7 +4,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { toast, ToastContainer } from 'react-toastify'
-import { registerAPI } from '../services/allAPI'
+import { loginAPI, registerAPI } from '../services/allAPI'
 
 
 function Auth({registerURL}) {
@@ -17,7 +17,7 @@ function Auth({registerURL}) {
     username:registerURL?Yup.string().required("*Username is required"):Yup.string(),
     email:Yup.string().email("Invalid Email").required("*Email is required"),
     password:Yup.string().min(6,"Minimun 6 Characters").required("*Password is required"),
-    role:Yup.string().required("*Select a Role")
+    role:registerURL? Yup.string().required("*Select a Role"):Yup.string()
   })
   return (
     <>
@@ -30,24 +30,50 @@ function Auth({registerURL}) {
           <p className="text-center text-slate-500 mb-6">
             {registerURL? "Join SkillNest and start learning today": "Login to continue your learning journey"}
           </p>
-          <Formik initialValues={{username:"",email:"",password:"",role:""}} validationSchema={validationSchema} onSubmit={async(values,{resetForm})=>{
-            console.log(values);
+          <Formik initialValues={{username:"",email:"",password:"",role:""}} validationSchema={validationSchema} onSubmit={async(values,{resetForm})=>{            
             try {
               setLoading(true)
-              const result = await registerAPI(values)
-              if(result.status == 200){
-                if(values.role == "educator"){
-                  toast.success("Registration successful...Awaiting admin approval!!!")
-                }else{
-                  toast.success("Registration successful...Please login!!!")
+              // logic for register
+              if(registerURL){
+                const result = await registerAPI(values)
+                if(result.status == 200){
+                  if(values.role == "educator"){
+                    toast.success("Registration successful...Awaiting admin approval!!!")
+                  }else{
+                    toast.success("Registration successful...Please login!!!")
+                    navigate('/login')
+                  }
+                }else if(result.status == 409){
+                  toast.warning(result.response.data)
                   navigate('/login')
+                }else{
+                  toast.error("Something went Wrong!!!")
                 }
-              }else if(result.status == 409){
-                toast.warning(result.response.data)
-                navigate('/login')
+
               }else{
-                toast.error("Something went Wrong!!!")
+                // logic for login
+                const result = await loginAPI(values)
+                if(result.status == 200){
+                  sessionStorage.setItem("token",result.data.token)
+                  sessionStorage.setItem("user",JSON.stringify(result.data.user))
+                  toast.success("Login Successfull!!!")
+                  setTimeout(() => {
+                    if(result.data.user.role == "admin"){
+                      navigate('/admin/dashboard')
+                    }else if(result.data.user.role == "educator"){
+                      navigate('/educator/dashboard')
+                    }else{
+                      navigate('/')
+                    }
+                  }, 2500);
+                }else if(result.status == 401 || result.status == 403 || result.status == 404){
+                  toast.warning(result.response.data)
+                }else{
+                  toast.error("Something went wrong!!!!")
+                  console.log(result);
+                }
               }
+              
             } catch (error) {
               console.log(error);
             }
