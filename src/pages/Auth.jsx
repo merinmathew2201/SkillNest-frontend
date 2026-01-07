@@ -1,11 +1,16 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik'
 import React, { useState } from 'react'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
+import { toast, ToastContainer } from 'react-toastify'
+import { registerAPI } from '../services/allAPI'
+
 
 function Auth({registerURL}) {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   // validation rules
   const validationSchema = Yup.object({
@@ -25,8 +30,28 @@ function Auth({registerURL}) {
           <p className="text-center text-slate-500 mb-6">
             {registerURL? "Join SkillNest and start learning today": "Login to continue your learning journey"}
           </p>
-          <Formik initialValues={{username:"",email:"",password:"",role:""}} validationSchema={validationSchema} onSubmit={(values,{resetForm})=>{
+          <Formik initialValues={{username:"",email:"",password:"",role:""}} validationSchema={validationSchema} onSubmit={async(values,{resetForm})=>{
             console.log(values);
+            try {
+              setLoading(true)
+              const result = await registerAPI(values)
+              if(result.status == 200){
+                if(values.role == "educator"){
+                  toast.success("Registration successful...Awaiting admin approval!!!")
+                }else{
+                  toast.success("Registration successful...Please login!!!")
+                  navigate('/login')
+                }
+              }else if(result.status == 409){
+                toast.warning(result.response.data)
+                navigate('/login')
+              }else{
+                toast.error("Something went Wrong!!!")
+              }
+            } catch (error) {
+              console.log(error);
+            }
+            setLoading(false)
             resetForm()
           }}>
             <Form>
@@ -76,13 +101,14 @@ function Auth({registerURL}) {
               }
               
               {/* Submit */}
-              <button type='submit' className="w-full bg-cyan-500 text-white py-2 rounded-xl hover:bg-cyan-600">
-                {registerURL ? "Register" : "Login"}
+              <button type='submit' disabled={loading} className="w-full bg-cyan-500 text-white py-2 rounded-xl hover:bg-cyan-600">
+                {loading?"Please Wait..":registerURL ? "Register" : "Login"}
               </button>
             </Form>
           </Formik>
         </div>
       </div>
+      <ToastContainer position='top-center' autoClose={3000} theme='colored'/>
     </>
    
   )
