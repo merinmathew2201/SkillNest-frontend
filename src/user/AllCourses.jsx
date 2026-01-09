@@ -1,13 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { FaStar } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 
 function AllCourses() {
+    const [token,setToken] = useState("")
+
+    useEffect(()=>{
+    if(sessionStorage.getItem("token")){
+      const userToken = sessionStorage.getItem("token")
+      setToken(userToken)
+    }
+  },[])
+
   return (
     <>
     <Header/>
+    {token?
     <div className="min-h-screen bg-slate-50 px-6 md:px-16 py-12">
 
       {/* Page Heading */}
@@ -223,6 +233,12 @@ function AllCourses() {
         </section>
       </div>
     </div>
+    :
+    <div className='w-full h-screen flex justify-center items-center flex-col'>
+      <img className='w-50' src="https://media.lordicon.com/icons/wired/gradient/94-lock-unlock.gif" alt="lockscreen" />
+      <p className="text-lg text-cyan-600 font-bold my-15">Please <Link to={'/login'} className='text-blue-600 underline'>Login</Link> to Explore More Courses ...</p>
+    </div>
+    }
     <Footer/>
     </>
   )

@@ -4,7 +4,9 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { toast, ToastContainer } from 'react-toastify'
-import { loginAPI, registerAPI } from '../services/allAPI'
+import { googleLoginAPI, loginAPI, registerAPI } from '../services/allAPI'
+import { GoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
 
 
 function Auth({registerURL}) {
@@ -19,6 +21,31 @@ function Auth({registerURL}) {
     password:Yup.string().min(6,"Minimun 6 Characters").required("*Password is required"),
     role:registerURL? Yup.string().required("*Select a Role"):Yup.string()
   })
+
+  const handleGoogleLogin = async (credentialResponse)=>{
+    console.log("Inside handleGoogleLogin");
+    try {
+      const decode = jwtDecode(credentialResponse.credential)
+      console.log(decode.email,decode.name,decode.picture);
+      const result = await googleLoginAPI({username:decode.name,email:decode.email,picture:decode.picture})
+      if(result.status == 200){
+        sessionStorage.setItem("token",result.data.token)
+        sessionStorage.setItem("user",JSON.stringify(result.data.user))
+        toast.success("Login Successfull!!!")
+        setTimeout(() => {
+          navigate("/")
+        }, 2000)
+      }else if(result.status == 403){
+        toast.warning(result.response.data)
+      }else{
+        toast.error("Something went Wrong!!!")
+        console.log(result);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
   return (
     <>
       <div className="min-h-screen flex items-center justify-center bg-sky-50">
@@ -48,6 +75,7 @@ function Auth({registerURL}) {
                   navigate('/login')
                 }else{
                   toast.error("Something went Wrong!!!")
+                  console.log(result);
                 }
 
               }else{
@@ -120,18 +148,39 @@ function Auth({registerURL}) {
                 </div>
                 <ErrorMessage name="role" component="p" className="text-red-500 text-sm"/>
               </>}
-
-              {registerURL?
-              <p className='text-gray-600 text-sm my-5'>Already have an account?<Link to={'/login'} className='text-cyan-600'>Login</Link></p>:
-              <p className='text-gray-600 text-sm my-5'>Don’t have an account yet?<Link to={'/register'} className='text-cyan-600'>Register</Link></p>
-              }
               
               {/* Submit */}
-              <button type='submit' disabled={loading} className="w-full bg-cyan-500 text-white py-2 rounded-xl hover:bg-cyan-600">
+              <button type='submit' disabled={loading} className="w-full bg-cyan-500 text-white py-2 mt-5 rounded-xl hover:bg-cyan-600">
                 {loading?"Please Wait..":registerURL ? "Register" : "Login"}
               </button>
             </Form>
           </Formik>
+          {/* google authentication */}
+              {
+                !registerURL && 
+                <div className="mt-5 text-center">
+                  <p className='text-slate-500'>------------------------------or------------------------------</p>
+                  <div className="mt-2 flex justify-center items-center flex-col w-full">
+                    <GoogleLogin
+                      onSuccess={credentialResponse => {
+                        handleGoogleLogin(credentialResponse);
+                        
+                      }}
+                      onError={() => {
+                        console.log('Login Failed');
+                      }}
+                    />
+                    <p className='text-slate-500 mt-2 text-xs'>Google login is available for students only</p>
+                  </div>
+                  <p className=' text-slate-500 '>--------------------------------------------------------------</p>
+
+                </div>
+              }
+
+              {registerURL?
+              <p className='text-gray-600 text-sm mt-3 text-center'>Already have an account?<Link to={'/login'} className='text-cyan-600'>Login</Link></p>:
+              <p className='text-gray-600 text-sm  text-center'>Don’t have an account yet?<Link to={'/register'} className='text-cyan-600'>Register</Link></p>
+              }
         </div>
       </div>
       <ToastContainer position='top-center' autoClose={3000} theme='colored'/>
