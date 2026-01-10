@@ -31,3 +31,8 @@ export const getAllPendingUsersAPI = async (reqHeader)=>{
 export const approveEducatorAPI = async (id,reqHeader)=>{
     return await commonAPI ("PUT",`${serverURL}/educator/${id}/approve`,{},reqHeader)
 }
+
+// /users/:id/remove - called by admin users when clicked on delete button
+export const removeUserAPI = async (id,reqHeader)=>{
+    return await commonAPI ("DELETE",`${serverURL}/users/${id}/remove`,{},reqHeader)
+}

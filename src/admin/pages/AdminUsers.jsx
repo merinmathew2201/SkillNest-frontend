@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { FaTrash } from 'react-icons/fa';
-import { approveEducatorAPI, getAllPendingUsersAPI, getAllUsersAPI } from '../../services/allAPI';
+import { approveEducatorAPI, getAllPendingUsersAPI, getAllUsersAPI, removeUserAPI } from '../../services/allAPI';
 import { toast, ToastContainer } from 'react-toastify';
 
 function AdminUsers() {
     const [activeTab, setActiveTab] = useState("pending");
     const [allUsers,setAllUsers] = useState([])
     const [pendingUsers,setPendingUsers] = useState([])
-    console.log(pendingUsers);
+    console.log(allUsers);
     
 
     useEffect(()=>{
@@ -58,6 +58,23 @@ function AdminUsers() {
       }
       }
     }
+
+    const removeUser = async(id)=>{
+      const token = sessionStorage.getItem('token')
+      if(token){
+        const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      } 
+      const result = await removeUserAPI(id,reqHeader)
+      if(result.status==200){
+        if(activeTab=="all"){
+          getAllUsers(token)
+        }else{
+          getAllPendingUsers(token)
+        }
+      }
+    }
+  }
   return (
     <div>
       <h1 className="text-3xl font-bold mb-2">Users</h1>
@@ -111,7 +128,7 @@ function AdminUsers() {
                         <button onClick={()=>updateEducatorStatus(pendingUser?._id)} className="bg-green-500 px-2 py-1 sm:px-3 sm:py-2 text-white rounded text-xs sm:text-sm">
                           Approve
                         </button>
-                        <button className="text-red-500">
+                        <button onClick={()=>removeUser(pendingUser?._id)} className="text-red-500">
                           <FaTrash />
                         </button>
                       </td>
@@ -150,7 +167,7 @@ function AdminUsers() {
                       <td className="p-2 sm:p-3">{user?.role}</td>
                       <td className="p-2 sm:p-3">{user?.approvalStatus?"Approved":"Pending"}</td>
                       <td className="p-2 sm:p-3">
-                        <button className="text-red-500">
+                        <button onClick={()=>removeUser(user?._id)} className="text-red-500">
                           <FaTrash />
                         </button>
                       </td>
