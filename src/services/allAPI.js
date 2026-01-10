@@ -36,3 +36,13 @@ export const approveEducatorAPI = async (id,reqHeader)=>{
 export const removeUserAPI = async (id,reqHeader)=>{
     return await commonAPI ("DELETE",`${serverURL}/users/${id}/remove`,{},reqHeader)
 }
+
+// /student/:id/edit-info - for user info updation called by edit when user click on save changes 
+export const updateStudentInfoAPI = async (id,reqBody,reqHeader)=>{
+    return await commonAPI ("PUT",`${serverURL}/student/${id}/edit-info`,reqBody,reqHeader)
+}
+
+// /student/:id/password - for user info updation called by edit when user click on save changes 
+export const updatePasswordInfoAPI = async (id,reqBody,reqHeader)=>{
+    return await commonAPI ("PUT",`${serverURL}/student/${id}/password`,reqBody,reqHeader)
+}

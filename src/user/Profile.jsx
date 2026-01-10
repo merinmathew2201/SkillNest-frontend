@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link } from 'react-router-dom'
@@ -6,6 +6,13 @@ import EditProfile from './EditProfile'
 
 function Profile() {
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [userDetails,setUserDetails] = useState({})
+    
+    useEffect(()=>{
+      if(sessionStorage.getItem("token") && sessionStorage.getItem("user")){
+        setUserDetails(JSON.parse(sessionStorage.getItem("user")))
+      }
+    },[userDetails])
   return (
     <>
     <Header/>
@@ -18,16 +25,16 @@ function Profile() {
         {/* Profile Card */}
         <div className="bg-white rounded-xl shadow p-6 md:flex items-center  gap-6">
           <img
-            src="https://i.pravatar.cc/150?img=12"
+            src={userDetails?.picture==""?"https://cdn-icons-png.flaticon.com/512/8847/8847419.png":userDetails?.picture}
             alt="profile"
             className="w-24 h-24 rounded-full object-cover"
           />
 
           <div className="flex-1">
-            <h2 className="text-2xl font-semibold">Ankit Varma</h2>
-            <p className="text-slate-600">ankit@gmail.com</p>
+            <h2 className="text-2xl font-semibold">{userDetails?.username}</h2>
+            <p className="text-slate-600">{userDetails?.email}</p>
             <span className="inline-block mt-2 px-3 py-1 text-xs bg-cyan-100 text-cyan-700 rounded-full">
-              Student
+              {userDetails?.role}
             </span>
           </div>
 

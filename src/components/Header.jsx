@@ -76,12 +76,12 @@ function Header() {
         :
         <div>
             <button onClick={()=>setDropdown(!dropdown)} className="shadow-sm rounded ms-5 p-2 hover:bg-gray-100">
-              <img width={'40px'} height={'40px'} style={{borderRadius:'50%'}} src={dp?dp:"https://static.vecteezy.com/system/resources/thumbnails/019/879/186/small/user-icon-on-transparent-background-free-png.png"} alt="profile" />
+              <img width={'30px'} height={'30px'} style={{borderRadius:'50%'}} src={dp?dp:"https://cdn-icons-png.flaticon.com/512/8847/8847419.png"} alt="profile" />
             </button> 
           {/* dropdown menu */}
           {
             dropdown && 
-             <div className="absolute right-0 z-10 mt-2 w-40 shadow rounded bg-white ring-1 ring-black/50 p-2 focus:outline-hidden">
+             <div className="absolute right-1 z-10 mt-2 w-40 shadow rounded bg-white ring-1 ring-cyan-100 p-2 focus:outline-hidden">
               {/* profile link */}
               <Link to={'/learner/profile'} className='flex items-center text-gray-700 text-sm px-3 py-2'><FaAddressCard className='me-2'/>Profile</Link>
               {/* logout btn */}
@@ -114,12 +114,12 @@ function Header() {
             :
           <div>
             <button onClick={()=>setDropdown(!dropdown)} className="shadow-sm rounded ms-5 p-2 hover:bg-gray-100">
-              <img width={'40px'} height={'40px'} style={{borderRadius:'50%'}} src={dp?dp:"https://static.vecteezy.com/system/resources/thumbnails/019/879/186/small/user-icon-on-transparent-background-free-png.png"} alt="profile" />
+              <img width={'40px'} height={'40px'} style={{borderRadius:'50%'}} src={dp?dp:"https://cdn-icons-png.flaticon.com/512/8847/8847419.png"} alt="profile" />
             </button> 
           {/* dropdown menu */}
           {
             dropdown && 
-             <div className="absolute right-0 z-10 mt-2 w-40 shadow rounded bg-white ring-1 ring-black/50 p-2 focus:outline-hidden">
+             <div className="absolute right-1 z-10 mt-2 w-40 shadow rounded bg-white ring-1 ring-cyan-100 p-2 focus:outline-hidden">
               {/* profile link */}
               <Link to={'/learner/profile'} className='flex items-center text-gray-700 text-sm px-3 py-2'><FaAddressCard className='me-2'/>Profile</Link>
               {/* logout btn */}
