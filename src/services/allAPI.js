@@ -46,3 +46,8 @@ export const updateStudentInfoAPI = async (id,reqBody,reqHeader)=>{
 export const updatePasswordInfoAPI = async (id,reqBody,reqHeader)=>{
     return await commonAPI ("PUT",`${serverURL}/student/${id}/password`,reqBody,reqHeader)
 }
+
+// /educator/course/create- create course called by educatorcreatecourse when clicked on submit button
+export const createCourseAPI = async (reqBody,reqHeader)=>{
+    return await commonAPI ("POST",`${serverURL}/educator/course/create`,reqBody,reqHeader)
+}
