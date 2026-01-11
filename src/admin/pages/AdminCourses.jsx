@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { FaTrash } from 'react-icons/fa';
-import { getAllCoursesAPI, getAllPendingCoursesAPI } from '../../services/allAPI';
+import { approveCourseAPI, getAllCoursesAPI, getAllPendingCoursesAPI, removeCourseAPI } from '../../services/allAPI';
 import serverURL from '../../services/serverURL';
+import { toast, ToastContainer } from 'react-toastify';
 
 function AdminCourses() {
     const [activeTab, setActiveTab] = useState("pending");
@@ -44,6 +45,37 @@ function AdminCourses() {
         console.log(result);
       }
     }
+
+    const updateCourseStatus = async (id)=>{
+      const token = sessionStorage.getItem('token')
+      if(token){
+        const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      }
+      const result = await approveCourseAPI(id,reqHeader)
+      if(result.status == 200){
+        toast.success("Course approved successfully!!!!")
+        getAllPendingCourses(token)
+      }
+      }
+    }
+
+    const removeCourse = async(id)=>{
+      const token = sessionStorage.getItem('token')
+      if(token){
+        const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      } 
+      const result = await removeCourseAPI(id,reqHeader)
+      if(result.status==200){
+        if(activeTab=="all"){
+          getAllCourses(token)
+        }else{
+          getAllPendingCourses(token)
+        }
+      }
+    }
+  }
   return (
     <div>
       <h1 className="text-3xl font-bold mb-2">Courses</h1>
@@ -95,10 +127,10 @@ function AdminCourses() {
                     <td className="p-2 sm:p-3">$ {course?.price}</td>
                     <td className="p-2 sm:p-3">{course?.educatorMail}</td>
                     <td className="pb-1 flex gap-2">
-                      <button className="bg-green-500 px-2 py-1 sm:px-3 sm:py-2 text-white rounded text-xs sm:text-sm hover:bg-green-700">
+                      <button onClick={()=>updateCourseStatus(course?._id)} className="bg-green-500 px-2 py-1 sm:px-3 sm:py-2 text-white rounded text-xs sm:text-sm hover:bg-green-700">
                         Approve
                       </button>
-                      <button className="text-red-500 hover:text-red-700">
+                      <button onClick={()=>removeCourse(course?._id)} className="text-red-500 hover:text-red-700">
                         <FaTrash />
                       </button>
                     </td>
@@ -139,7 +171,7 @@ function AdminCourses() {
                         
                       </td>
                       <td className="pb-1 sm:p-3">
-                        <button className="text-red-500 hover:text-red-700">
+                        <button onClick={()=>removeCourse(course?._id)}  className="text-red-500 hover:text-red-700">
                           <FaTrash />
                         </button>
                       </td>
@@ -156,6 +188,7 @@ function AdminCourses() {
 
         </div>
       </div>
+      <ToastContainer position='top-center' autoClose={3000} theme='colored'/>
     </div>
   )
 }

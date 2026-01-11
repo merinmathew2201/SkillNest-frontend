@@ -61,3 +61,13 @@ export const getAllCoursesAPI = async (reqHeader)=>{
 export const getAllPendingCoursesAPI = async (reqHeader)=>{
     return await commonAPI ("GET",`${serverURL}/courses/pending`,{},reqHeader)
 }
+
+// /course/:id/approve-called by adminCourses when clicked on approve button
+export const approveCourseAPI = async (id,reqHeader)=>{
+    return await commonAPI ("PUT",`${serverURL}/course/${id}/approve`,{},reqHeader)
+}
+
+// /course/:id/remove - called by admin users when clicked on delete button
+export const removeCourseAPI = async (id,reqHeader)=>{
+    return await commonAPI ("DELETE",`${serverURL}/course/${id}/remove`,{},reqHeader)
+}
