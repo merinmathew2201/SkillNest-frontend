@@ -1,8 +1,49 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaTrash } from 'react-icons/fa';
+import { getAllCoursesAPI, getAllPendingCoursesAPI } from '../../services/allAPI';
+import serverURL from '../../services/serverURL';
 
 function AdminCourses() {
     const [activeTab, setActiveTab] = useState("pending");
+    const [allCourses,setAllCourses] = useState([])
+    const [pendingCourses,setPendingCourses] = useState([])
+    console.log(pendingCourses);
+    
+
+    useEffect(()=>{
+      const token = sessionStorage.getItem("token")
+      if(token){
+        if(activeTab=="all"){
+          getAllCourses(token)
+        }else{
+          getAllPendingCourses(token)
+        }
+      }
+    },[activeTab])
+
+    const getAllCourses = async (token)=>{
+      const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      }
+      const result = await getAllCoursesAPI(reqHeader)
+      if(result.status == 200){
+        setAllCourses(result.data)
+      }else{
+        console.log(result);
+      }
+    }
+
+    const getAllPendingCourses = async (token)=>{
+      const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      }
+      const result = await getAllPendingCoursesAPI(reqHeader)
+      if(result.status == 200){
+        setPendingCourses(result.data)
+      }else{
+        console.log(result);
+      }
+    }
   return (
     <div>
       <h1 className="text-3xl font-bold mb-2">Courses</h1>
@@ -36,40 +77,37 @@ function AdminCourses() {
             <table className="min-w-105 w-full text-sm sm:text-base">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="text-left p-2 sm:p-3">ID</th>
+                  <th className="text-left p-2 sm:p-3">#</th>
                   <th className="text-left p-2 sm:p-3">Title</th>
-                  <th className="text-left p-2 sm:p-3">Educator</th>
+                  <th className="text-left p-2 sm:p-3">Category</th>
+                  <th className="text-left p-2 sm:p-3">Price</th>
+                  <th className="text-left p-2 sm:p-3">Educator Email</th>
                   <th className="text-left p-2 sm:p-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b hover:bg-gray-50">
-                  <td className="p-2 sm:p-3">1</td>
-                  <td className="p-2 sm:p-3">React for Beginners</td>
-                  <td className="p-2 sm:p-3">Alice Johnson</td>
-                  <td className="p-2 sm:p-3 flex gap-2">
-                    <button className="bg-green-500 px-2 py-1 sm:px-3 sm:py-2 text-white rounded text-xs sm:text-sm hover:bg-green-700">
-                      Approve
-                    </button>
-                    <button className="text-red-500 hover:text-red-700">
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-
-                <tr className="border-b hover:bg-gray-50">
-                  <td className="p-2 sm:p-3">2</td>
-                  <td className="p-2 sm:p-3">Node.js Masterclass</td>
-                  <td className="p-2 sm:p-3">Bob Smith</td>
-                  <td className="p-2 sm:p-3 flex gap-2">
-                    <button className="bg-green-500 px-2 py-1 sm:px-3 sm:py-2 text-white rounded text-xs sm:text-sm hover:bg-green-700">
-                      Approve
-                    </button>
-                    <button className="text-red-500 hover:text-red-700">
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
+                {pendingCourses?.length>0?
+                pendingCourses?.map((course,index)=>(
+                  <tr key={course?._id} className="border-b hover:bg-gray-50">
+                    <td className="p-2 sm:p-3">{index+1}</td>
+                    <td className="p-1 sm:p-3 flex items-center"><img width={'40px'} className='me-2 rounded' src={`${serverURL}/uploads/images/${course?.thumbnail}`} alt="course image" />{course?.title}</td>
+                    <td className="p-2 sm:p-3">{course?.category}</td>
+                    <td className="p-2 sm:p-3">$ {course?.price}</td>
+                    <td className="p-2 sm:p-3">{course?.educatorMail}</td>
+                    <td className="pb-1 flex gap-2">
+                      <button className="bg-green-500 px-2 py-1 sm:px-3 sm:py-2 text-white rounded text-xs sm:text-sm hover:bg-green-700">
+                        Approve
+                      </button>
+                      <button className="text-red-500 hover:text-red-700">
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+                :
+                <p className='px-8 font-bold my-3'>No pending course requests....</p>
+                }
+                
               </tbody>
             </table>
           )}
@@ -80,43 +118,38 @@ function AdminCourses() {
                 <tr>
                   <th className="text-left p-2 sm:p-3">ID</th>
                   <th className="text-left p-2 sm:p-3">Title</th>
-                  <th className="text-left p-2 sm:p-3">Educator</th>
+                  <th className="text-left p-2 sm:p-3">Educator Email</th>
                   <th className="text-left p-2 sm:p-3">Status</th>
                   <th className="text-left p-2 sm:p-3">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b hover:bg-gray-50">
-                  <td className="p-2 sm:p-3">3</td>
-                  <td className="p-2 sm:p-3">JavaScript Advanced</td>
-                  <td className="p-2 sm:p-3">Alice Johnson</td>
-                  <td className="p-2 sm:p-3">
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs sm:text-sm">
-                      Active
-                    </span>
-                  </td>
-                  <td className="p-2 sm:p-3">
-                    <button className="text-red-500 hover:text-red-700">
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
+                {allCourses?.length>0?
+                  allCourses?.map((course)=>(
+                    <tr key={course?._id} className="border-b hover:bg-gray-50">
+                      <td className="p-2 sm:p-3">{course?._id}</td>
+                      <td className="p-1 sm:p-3 flex items-center"><img width={'40px'} className='me-2 rounded' src={`${serverURL}/uploads/images/${course?.thumbnail}`} alt="course image" />{course?.title}</td>
+                      <td className="p-2 sm:p-3">{course?.educatorMail}</td>
+                      <td className="p-2 sm:p-3">
+                        {course?.courseApproved?<span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs sm:text-sm">
+                          Approved
+                        </span>:<span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs sm:text-sm">
+                          Pending
+                        </span>}
+                        
+                      </td>
+                      <td className="pb-1 sm:p-3">
+                        <button className="text-red-500 hover:text-red-700">
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                :
+                <p className='px-8 font-bold my-3'>Loading....</p>}
+                
 
-                <tr className="border-b hover:bg-gray-50">
-                  <td className="p-2 sm:p-3">4</td>
-                  <td className="p-2 sm:p-3">CSS Animations</td>
-                  <td className="p-2 sm:p-3">Bob Smith</td>
-                  <td className="p-2 sm:p-3">
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs sm:text-sm">
-                      Active
-                    </span>
-                  </td>
-                  <td className="p-2 sm:p-3">
-                    <button className="text-red-500 hover:text-red-700">
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
+                
               </tbody>
             </table>
           )}

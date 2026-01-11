@@ -51,3 +51,13 @@ export const updatePasswordInfoAPI = async (id,reqBody,reqHeader)=>{
 export const createCourseAPI = async (reqBody,reqHeader)=>{
     return await commonAPI ("POST",`${serverURL}/educator/course/create`,reqBody,reqHeader)
 }
+
+// /courses/all -called by adminCourses when page loads
+export const getAllCoursesAPI = async (reqHeader)=>{
+    return await commonAPI ("GET",`${serverURL}/courses/all`,{},reqHeader)
+}
+
+// /courses/pending -called by adminCourses when page loads
+export const getAllPendingCoursesAPI = async (reqHeader)=>{
+    return await commonAPI ("GET",`${serverURL}/courses/pending`,{},reqHeader)
+}
