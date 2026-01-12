@@ -1,7 +1,13 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function EducatorHeader() {
+  const navigate = useNavigate()
+
+  const logout = ()=>{
+    sessionStorage.clear()
+    navigate('/')
+  }
   return (
     <header className="bg-white shadow-md px-6 py-4 flex items-center justify-between sticky top-0 z-50">
 
@@ -28,11 +34,9 @@ function EducatorHeader() {
 
       {/* Right */}
       <div className="flex items-center gap-4 text-sm">
-        <Link to="/" className="text-slate-600 hover:text-cyan-600">
-          Home
-        </Link>
+        
 
-        <button className="text-red-500 hover:underline">
+        <button onClick={logout} className="text-red-500 hover:underline">
           Logout
         </button>
       </div>

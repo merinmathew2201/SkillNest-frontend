@@ -1,7 +1,30 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaBook, FaChalkboardTeacher, FaClock, FaUsers } from 'react-icons/fa'
+import { getStatsAPI } from '../../services/allAPI'
 
 function AdminDashboard() {
+  const [stats,setStats] = useState({
+    totalStudents:"",totalEducators:"",totalCourses:"",totalPendingApprovals:""
+  })
+  
+  useEffect(()=>{
+    getDashboardStats()
+  },[stats])
+
+  const getDashboardStats = async()=>{
+    const token = sessionStorage.getItem("token")
+    if(token){
+      const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      }
+      const result = await getStatsAPI(reqHeader)
+      if (result.status == 200){
+        setStats(result.data)
+      }else{
+        console.log(result);
+      }
+    }
+  }
   return (
     <div>
       {/* Page Title */}
@@ -23,7 +46,7 @@ function AdminDashboard() {
         <div className="flex items-center gap-4 p-6 rounded-lg shadow hover:shadow-lg transition bg-blue-100">
           <FaUsers className="text-3xl text-blue-500" />
           <div>
-            <h2 className="text-2xl font-bold">1200</h2>
+            <h2 className="text-2xl font-bold">{stats?.totalStudents}</h2>
             <p className="text-gray-700">Total Students</p>
           </div>
         </div>
@@ -32,7 +55,7 @@ function AdminDashboard() {
         <div className="flex items-center gap-4 p-6 rounded-lg shadow hover:shadow-lg transition bg-green-100">
           <FaChalkboardTeacher className="text-3xl text-green-500" />
           <div>
-            <h2 className="text-2xl font-bold">45</h2>
+            <h2 className="text-2xl font-bold">{stats?.totalEducators}</h2>
             <p className="text-gray-700">Total Educators</p>
           </div>
         </div>
@@ -41,7 +64,7 @@ function AdminDashboard() {
         <div className="flex items-center gap-4 p-6 rounded-lg shadow hover:shadow-lg transition bg-purple-100">
           <FaBook className="text-3xl text-purple-500" />
           <div>
-            <h2 className="text-2xl font-bold">78</h2>
+            <h2 className="text-2xl font-bold">{stats?.totalCourses}</h2>
             <p className="text-gray-700">Total Courses</p>
           </div>
         </div>
@@ -50,7 +73,7 @@ function AdminDashboard() {
         <div className="flex items-center gap-4 p-6 rounded-lg shadow hover:shadow-lg transition bg-red-100">
           <FaClock className="text-3xl text-red-500" />
           <div>
-            <h2 className="text-2xl font-bold">5</h2>
+            <h2 className="text-2xl font-bold">{stats?.totalPendingApprovals}</h2>
             <p className="text-gray-700">Pending Approvals</p>
           </div>
         </div>

@@ -71,3 +71,13 @@ export const approveCourseAPI = async (id,reqHeader)=>{
 export const removeCourseAPI = async (id,reqHeader)=>{
     return await commonAPI ("DELETE",`${serverURL}/course/${id}/remove`,{},reqHeader)
 }
+
+// /dashboard-stats- called by adminDashboard when page loads
+export const getStatsAPI = async (reqHeader)=>{
+    return await commonAPI ("GET",`${serverURL}/dashboard-stats`,{},reqHeader)
+}
+
+// /educator/courses- called by educatorCourses when page loads
+export const getEducatorCoursesAPI = async (reqHeader)=>{
+    return await commonAPI ("GET",`${serverURL}/educator/courses`,{},reqHeader)
+}

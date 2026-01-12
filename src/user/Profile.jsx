@@ -116,7 +116,7 @@ function Profile() {
           <h3 className="text-lg font-semibold mb-3">Account Information</h3>
           
           <p className="text-sm text-slate-600 mt-1">
-            Account Type: <span className="font-medium">Student</span>
+            Account Type: <span className="font-medium">{userDetails?.role}</span>
           </p>
         </div>
 

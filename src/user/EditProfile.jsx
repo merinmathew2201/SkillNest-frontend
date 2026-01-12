@@ -67,7 +67,7 @@ function EditProfile({ isOpen, onClose }) {
         try {
           const result = await updatePasswordInfoAPI(user?._id,{password:newPassword},reqHeader)
           if(result.status == 200){
-            toast.success("Profile Updated Successfully..")
+            toast.success("Password Updated Successfully..")
             setTimeout(() => {
               sessionStorage.clear()
               navigate('/login')
