@@ -35,7 +35,7 @@ function App() {
       <Route path='/educator/dashboard' element={<EducatorDashboard/>}/>
       <Route path='/educator/create-course' element={<EducatorCreateCourse/>}/>
       <Route path='/educator/courses' element={<EducatorCourses/>}/>
-      <Route path='/educator/courses/:id/manage' element={<EducatorManageCourse/>}/>
+      <Route path='/educator/courses/:courseId/manage' element={<EducatorManageCourse/>}/>
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="dashboard" element={<AdminDashboard />} />

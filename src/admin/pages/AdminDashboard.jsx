@@ -9,7 +9,7 @@ function AdminDashboard() {
   
   useEffect(()=>{
     getDashboardStats()
-  },[stats])
+  },[])
 
   const getDashboardStats = async()=>{
     const token = sessionStorage.getItem("token")

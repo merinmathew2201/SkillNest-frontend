@@ -81,3 +81,23 @@ export const getStatsAPI = async (reqHeader)=>{
 export const getEducatorCoursesAPI = async (reqHeader)=>{
     return await commonAPI ("GET",`${serverURL}/educator/courses`,{},reqHeader)
 }
+
+// /course/add-section - called by educatormanagecourse when clicked on add section
+export const createSectionAPI = async (reqBody,reqHeader)=>{
+    return await commonAPI ("POST",`${serverURL}/course/add-section`,reqBody,reqHeader)
+}
+
+// /courses/:courseId/sections - get sections in a single course 
+export const getAllSectionsAPI = async (courseId,reqHeader)=>{
+    return await commonAPI ("GET",`${serverURL}/courses/${courseId}/sections`,{},reqHeader)
+}
+
+// /section/:sectionId/remove - remove section when clicked on delete btn
+export const removeSectionAPI = async (sectionId,reqHeader)=>{
+    return await commonAPI ("DELETE",`${serverURL}/section/${sectionId}/remove`,{},reqHeader)
+}
+
+// /educator/courses/:courseId - single course when mangecouse page loads
+export const getSingleCourseAPI = async (courseId,reqHeader)=>{
+    return await commonAPI ("GET",`${serverURL}/educator/courses/${courseId}`,{},reqHeader)
+}
