@@ -1,8 +1,31 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import EducatorHeader from '../components/EducatorHeader'
 import { Link } from 'react-router-dom'
+import { getEducatorStatsAPI } from '../../services/allAPI'
 
 function EducatorDashboard() {
+  const [stats,setStats] = useState({
+      totalCourses:"",approvedCourses:"",pendingCourses:"",totalStudents:""
+    })
+
+  useEffect(()=>{
+    getDashboardStats()
+  },[])
+
+  const getDashboardStats = async()=>{
+    const token = sessionStorage.getItem("token")
+    if(token){
+      const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      }
+      const result = await getEducatorStatsAPI(reqHeader)
+      if (result.status == 200){
+        setStats(result.data)
+      }else{
+        console.log(result);
+      }
+    }
+  }
   return (
     <>
         <EducatorHeader/>
@@ -24,22 +47,22 @@ function EducatorDashboard() {
     
             <div className="bg-white rounded-xl shadow p-6">
               <p className="text-slate-500 text-sm">Total Courses</p>
-              <h2 className="text-3xl font-bold text-slate-800 mt-2">3</h2>
+              <h2 className="text-3xl font-bold text-slate-800 mt-2">{stats?.totalCourses}</h2>
             </div>
     
             <div className="bg-white rounded-xl shadow p-6">
               <p className="text-slate-500 text-sm">Approved Courses</p>
-              <h2 className="text-3xl font-bold text-green-600 mt-2">2</h2>
+              <h2 className="text-3xl font-bold text-green-600 mt-2">{stats?.approvedCourses}</h2>
             </div>
     
             <div className="bg-white rounded-xl shadow p-6">
               <p className="text-slate-500 text-sm">Pending Approval</p>
-              <h2 className="text-3xl font-bold text-yellow-500 mt-2">1</h2>
+              <h2 className="text-3xl font-bold text-yellow-500 mt-2">{stats?.pendingCourses}</h2>
             </div>
     
             <div className="bg-white rounded-xl shadow p-6">
               <p className="text-slate-500 text-sm">Total Students</p>
-              <h2 className="text-3xl font-bold text-slate-800 mt-2">120</h2>
+              <h2 className="text-3xl font-bold text-slate-800 mt-2">{stats?.totalStudents}</h2>
             </div>
     
           </div>

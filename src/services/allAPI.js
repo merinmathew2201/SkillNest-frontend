@@ -101,3 +101,48 @@ export const removeSectionAPI = async (sectionId,reqHeader)=>{
 export const getSingleCourseAPI = async (courseId,reqHeader)=>{
     return await commonAPI ("GET",`${serverURL}/educator/courses/${courseId}`,{},reqHeader)
 }
+
+// /courses/:courseId/resources - get all resourses of the particular course
+export const getAllResourcesAPI = async (courseId,reqHeader)=>{
+    return await commonAPI ("GET",`${serverURL}/courses/${courseId}/resources`,{},reqHeader)
+}
+
+// /courses/add-resources
+export const createResourceAPI = async (reqBody,reqHeader)=>{
+    return await commonAPI ("POST",`${serverURL}/courses/add-resources`,reqBody,reqHeader)
+}
+
+// /resources/:resourceId/remove -remove resorse when clicked on the delete btn
+export const removeResourceAPI = async (resourceId, reqHeader) => {
+    return await commonAPI("DELETE",`${serverURL}/resources/${resourceId}/remove`,{},reqHeader);
+}
+
+// /courses/:courseId/students - student enrolled in the course
+export const getCourseStudentsAPI = async (courseId, reqHeader) => {
+  return await commonAPI("GET",`${serverURL}/courses/${courseId}/students`,{},reqHeader)
+}
+
+// /educator/dashboard-stats- called by adminDashboard when page loads
+export const getEducatorStatsAPI = async (reqHeader)=>{
+    return await commonAPI ("GET",`${serverURL}/educator/dashboard-stats`,{},reqHeader)
+}
+
+// /sections/add-lecture - called by educatormanagecourse
+export const createLectureAPI = async (reqBody,reqHeader)=>{
+    return await commonAPI ("POST",`${serverURL}/sections/add-lecture`,reqBody,reqHeader)
+}
+
+// /sections/:sectionId/lectures - called by educatormanagecourse
+export const getLecturesAPI = async (sectionId, reqHeader) => {
+  return await commonAPI("GET",`${serverURL}/sections/${sectionId}/lectures`,{},reqHeader)
+}
+
+// /course/publish/:courseId - called by manage course
+export const publishCourseAPI = async (courseId, reqHeader) => {
+  return await commonAPI("PUT",`${serverURL}/course/publish/${courseId}`,{},reqHeader)
+}
+
+// /lecture/delete/:lectureId - called by manage course when clicked on dlete button of lecture
+export const deleteLectureAPI = async (lectureId, reqHeader) => {
+  return await commonAPI("DELETE",`${serverURL}/lecture/delete/${lectureId}`,{},reqHeader)
+}

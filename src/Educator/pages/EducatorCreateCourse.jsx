@@ -38,6 +38,7 @@ function EducatorCreateCourse() {
                 const result = await createCourseAPI(reqBody,reqHeader)
                 if(result.status == 201){
                     toast.success("Course Created successfully....")
+                    
                 }else if(result.status == 409){
                     toast.warning(result.response.data)
                 }else{

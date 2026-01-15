@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import EducatorProfileEdit from './EducatorProfileEdit'
 
 function EducatorHeader() {
+  const [showModal, setShowModal] = useState(false)
   const navigate = useNavigate()
 
   const logout = ()=>{
@@ -30,7 +32,11 @@ function EducatorHeader() {
         <Link to="/educator/create-course" className="hover:text-cyan-600">
           Create Course
         </Link>
+        <button onClick={() => setShowModal(true)} className='hover:text-cyan-600 cursor-pointer'>Edit Profile</button>
       </nav>
+
+      {showModal&&
+      <EducatorProfileEdit isOpen={showModal} onClose={() => setShowModal(false)}/>}
 
       {/* Right */}
       <div className="flex items-center gap-4 text-sm">
