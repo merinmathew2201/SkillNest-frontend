@@ -175,7 +175,7 @@ function EducatorManageCourse() {
             const result = await deleteLectureAPI(lectureId, reqHeader)
             if (result.status === 200) {
                 toast.success("Lecture deleted")
-                getLecturesBySection() 
+                fetchAllLectures() 
             } else {
                 toast.error("Failed to delete lecture")
                 console.log(result);

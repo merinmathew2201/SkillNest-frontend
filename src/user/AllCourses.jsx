@@ -1,18 +1,54 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { FaStar } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import { searchContext } from '../contextAPI/ShareContext'
+import { getAllPublishedCoursesAPI } from '../services/allAPI'
+import serverURL from '../services/serverURL'
 
 function AllCourses() {
     const [token,setToken] = useState("")
+    const {searchKey,setSearchKey} = useContext(searchContext)
+    const [allCourses,setAllCourses] = useState([])
+    const [tempAllCourses,setTempAllCourses]= useState([])
+    const [categories,setCategories] = useState([])
+    console.log(allCourses);
+    
 
     useEffect(()=>{
-    if(sessionStorage.getItem("token")){
-      const userToken = sessionStorage.getItem("token")
-      setToken(userToken)
+      if(sessionStorage.getItem("token")){
+        const userToken = sessionStorage.getItem("token")
+        setToken(userToken)
+        getAllCourses(userToken)
+      }
+    },[searchKey])
+
+    const getAllCourses = async (token)=>{
+      const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      }
+      const result = await getAllPublishedCoursesAPI(reqHeader,searchKey)
+      if(result.status == 200){
+        setAllCourses(result.data)
+        setTempAllCourses(result.data)
+        const tempCategory = result.data?.map(item=>item.category)
+        setCategories([...new Set(tempCategory)])
+        
+      }else{
+        console.log(result);
+        
+      }
     }
-  },[])
+
+    const filterCourse = (category)=>{
+    if(category!="All Categories"){
+      setAllCourses(tempAllCourses?.filter(item=>item.category==category))
+    }else{
+      setAllCourses(tempAllCourses)
+    }
+  }
+
 
   return (
     <>
@@ -48,7 +84,7 @@ function AllCourses() {
             <label className="text-sm font-medium text-slate-600">
               Search
             </label>
-            <input type="text" placeholder="Search courses..." className="mt-2 w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-400"/>
+            <input value={searchKey} onChange={e=>setSearchKey(e.target.value)} type="text" placeholder="Search courses..." className="mt-2 w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-cyan-400"/>
           </div>
 
           {/* CATEGORY */}
@@ -61,32 +97,21 @@ function AllCourses() {
 
               {/* All Categories */}
               <label className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer">
-                <input type="radio" name="category" defaultChecked />
+                <input onClick={()=>filterCourse("All Categories")} type="radio" name='filter' id='nofilter'  />
                 All Categories
               </label>
 
               {/* Dynamic categories later */}
-              <label  className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer">
-                  <input type="radio" name="category" />
-                  category
-                </label>
-            </div>
-          </div>
-
-
-          {/* LEVEL */}
-          <div>
-            <h4 className="text-sm font-semibold text-slate-700 mb-3">
-              Level
-            </h4>
-
-            <div className="space-y-2">
-              {["Beginner", "Intermediate", "Advanced"].map((level) => (
-                <label key={level} className="flex items-center gap-2 text-sm text-slate-600">
-                  <input type="checkbox" className="accent-cyan-500" />
-                  {level}
-                </label>
-              ))}
+              {
+                categories?.map((item,index)=>(
+                  <div key={index}>
+                    <label htmlFor={item}  className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer">
+                        <input onClick={()=>filterCourse(item)} type="radio" name='filter'  id={item} />
+                        {item}
+                    </label>
+                  </div>
+                ))
+              }
             </div>
           </div>
 
@@ -100,135 +125,45 @@ function AllCourses() {
           <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
 
             {/* Duplicate cards */} 
-            <div className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2  overflow-hidden">
-              <img src="https://www.creativeinsightacademy.com/static/media/fullStackDevelopment.885c32d4b5d6f021462f.jpg" alt="course" className="h-44 w-full object-cover"/>
+            {
+              allCourses?.length>0 ?
+              allCourses?.map(course=>(
+                <div key={course?._id} className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2  overflow-hidden">
+                  <img src={`${serverURL}/uploads/images/${course?.thumbnail}`} alt="course" className="h-44 w-full object-cover"/>
 
-              <div className="p-5">
-                <h3 className="font-semibold text-lg text-slate-800">
-                  Full Stack Web Development
-                </h3>
+                  <div className="p-5">
+                    <h3 className="font-semibold text-lg text-slate-800">
+                      {course?.title}
+                    </h3>
 
-                <p className="text-sm text-slate-600 mt-2 line-clamp-2">
-                  Learn MERN stack with real-world projects and industry practices.
-                </p>
+                    <p className="text-sm text-slate-600 mt-2 line-clamp-2">
+                      {course?.shortDescription}
+                    </p>
 
-                <div className="flex justify-between text-xs text-slate-500 mt-4">
-                  <span>Beginner</span>
-                  <span>4 Weeks</span>
-                </div>
+                    <div className="flex justify-between text-xs text-slate-500 mt-4">
+                      <span>{course?.category}</span>
+                      <span>{course?.duration}</span>
+                    </div>
 
-                <div className="flex justify-between items-center mt-4">
-                  <span className="text-sm text-slate-700">
-                    By John Doe
-                  </span>
-                  <div className="flex items-center text-yellow-500 text-sm">
-                    <FaStar className="me-1" /> 4.8
+                    <div className='flex justify-between items-center mt-3'>
+                      <span className="text-cyan-600 font-bold ">
+                      $ {course?.price}
+                      </span>
+                      <span className="text-gray-400 text-xs ">
+                       {course?.level}
+                      </span>
+                    </div>
+
+                    <button className="w-full mt-5 py-2 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600 transition">
+                      <Link to={`/courses/${course?._id}/view`}>View Course</Link>
+                    </button>
                   </div>
                 </div>
+              ))
+              :
+              <p className='font bold px-10 my-5'>Loading.....</p>
+            }
 
-                <button className="w-full mt-5 py-2 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600 transition">
-                  <Link to={'/courses/:id/view'}>View Course</Link>
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2   overflow-hidden">
-              <img src="https://www.creativeinsightacademy.com/static/media/fullStackDevelopment.885c32d4b5d6f021462f.jpg" alt="course" className="h-44 w-full object-cover"/>
-
-              <div className="p-5">
-                <h3 className="font-semibold text-lg text-slate-800">
-                  Full Stack Web Development
-                </h3>
-
-                <p className="text-sm text-slate-600 mt-2 line-clamp-2">
-                  Learn MERN stack with real-world projects and industry practices.
-                </p>
-
-                <div className="flex justify-between text-xs text-slate-500 mt-4">
-                  <span>Beginner</span>
-                  <span>4 Weeks</span>
-                </div>
-
-                <div className="flex justify-between items-center mt-4">
-                  <span className="text-sm text-slate-700">
-                    By John Doe
-                  </span>
-                  <div className="flex items-center text-yellow-500 text-sm">
-                    <FaStar className="me-1" /> 4.8
-                  </div>
-                </div>
-
-                <button className="w-full mt-5 py-2 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600 transition">
-                  View Course
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2   overflow-hidden">
-              <img src="https://www.creativeinsightacademy.com/static/media/fullStackDevelopment.885c32d4b5d6f021462f.jpg" alt="course" className="h-44 w-full object-cover"/>
-
-              <div className="p-5">
-                <h3 className="font-semibold text-lg text-slate-800">
-                  Full Stack Web Development
-                </h3>
-
-                <p className="text-sm text-slate-600 mt-2 line-clamp-2">
-                  Learn MERN stack with real-world projects and industry practices.
-                </p>
-
-                <div className="flex justify-between text-xs text-slate-500 mt-4">
-                  <span>Beginner</span>
-                  <span>4 Weeks</span>
-                </div>
-
-                <div className="flex justify-between items-center mt-4">
-                  <span className="text-sm text-slate-700">
-                    By John Doe
-                  </span>
-                  <div className="flex items-center text-yellow-500 text-sm">
-                    <FaStar className="me-1" /> 4.8
-                  </div>
-                </div>
-
-                <button className="w-full mt-5 py-2 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600 transition">
-                  View Course
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2   overflow-hidden">
-              <img src="https://www.creativeinsightacademy.com/static/media/fullStackDevelopment.885c32d4b5d6f021462f.jpg" alt="course" className="h-44 w-full object-cover"/>
-
-              <div className="p-5">
-                <h3 className="font-semibold text-lg text-slate-800">
-                  Full Stack Web Development
-                </h3>
-
-                <p className="text-sm text-slate-600 mt-2 line-clamp-2">
-                  Learn MERN stack with real-world projects and industry practices.
-                </p>
-
-                <div className="flex justify-between text-xs text-slate-500 mt-4">
-                  <span>Beginner</span>
-                  <span>4 Weeks</span>
-                </div>
-
-                <div className="flex justify-between items-center mt-4">
-                  <span className="text-sm text-slate-700">
-                    By John Doe
-                  </span>
-                  <div className="flex items-center text-yellow-500 text-sm">
-                    <FaStar className="me-1" /> 4.8
-                  </div>
-                </div>
-
-                <button className="w-full mt-5 py-2 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600 transition">
-                  View Course
-                </button>
-              </div>
-            </div>
-
-            
           </div>
         </section>
       </div>

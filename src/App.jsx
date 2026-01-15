@@ -29,8 +29,8 @@ function App() {
       <Route path='/contact' element={<Contact/>}/>
       <Route path='/learner/profile' element={<Profile/>}/>
       <Route path='/courses' element={<AllCourses/>}/>
-      <Route path='/courses/:id/view' element={<ViewCourse/>}/>
-      <Route path='/courses/:id/learn' element={<CourseLearn/>}/>
+      <Route path='/courses/:courseId/view' element={<ViewCourse/>}/>
+      <Route path='/courses/:courseId/learn' element={<CourseLearn/>}/>
 
       <Route path='/educator/dashboard' element={<EducatorDashboard/>}/>
       <Route path='/educator/create-course' element={<EducatorCreateCourse/>}/>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link } from 'react-router-dom'
@@ -9,6 +9,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
+import { getLatestCoursesAPI } from '../services/allAPI';
+import serverURL from '../services/serverURL';
 
 
 function Home() {
@@ -42,6 +44,21 @@ function Home() {
   { name: "Sneha Patel", text: "Easy to follow, interactive, and practical.", img: "https://randomuser.me/api/portraits/women/65.jpg", rating: 4.9 },
   { name: "Ankit Verma", text: "A complete learning experience from basics to advanced.", img: "https://randomuser.me/api/portraits/men/78.jpg", rating: 5 },
 ];
+
+  const [latestCourses, setLatestCourses] = useState([])
+
+  useEffect(() => {
+    fetchLatestCourses()
+  }, [])
+
+  const fetchLatestCourses = async () => {
+    const result = await getLatestCoursesAPI()
+    if (result.status === 200) {
+      setLatestCourses(result.data)
+    }else{
+      console.log(result);
+    }
+  }
 
 
  
@@ -88,41 +105,35 @@ function Home() {
           Popular Courses
         </h2>
 
-        <Swiper
-          modules={[Navigation, Pagination]}
-          navigation
-          pagination={{ clickable: true, type: 'bullets' }}
-          spaceBetween={5}
-          slidesPerView="auto"
-          className="py-10 "
-        >
-          {[1, 2, 3, 4].map((_, i) => (
-            <SwiperSlide key={i} className="w-90! pb-10 pt-5 px-7">
-              <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-transform duration-300 overflow-hidden">
+        <Swiper modules={[Navigation, Pagination]} navigation pagination={{ clickable: true, type: 'bullets' }} spaceBetween={5}
+          slidesPerView="auto" className="py-10 ">
+
+          {
+            latestCourses?.length>0 ?
+          latestCourses?.map(course => (
+            <SwiperSlide key={course?._id} className="w-90! pb-10 pt-5 px-7">
+              <div style={{height:'360px'}} className="bg-white rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-transform duration-300 overflow-hidden">
                 <img
-                  src="https://www.creativeinsightacademy.com/static/media/fullStackDevelopment.885c32d4b5d6f021462f.jpg"
-                  alt="Full Stack Web Development"
+                  src={`${serverURL}/uploads/images/${course?.thumbnail}`}
+                  alt={course?.title}
                   className="h-40 w-full object-cover"
                 />
                 <div className="p-4">
                   <h3 className="font-semibold text-lg text-slate-800">
-                    Full Stack Web Development
+                    {course?.title}
                   </h3>
                   <p className="text-sm text-slate-600 mt-1 line-clamp-2">
-                    Learn MERN stack with real-world projects and industry practices.
+                    {course?.shortDescription}
                   </p>
 
                   <div className="flex justify-between text-xs text-slate-500 mt-3">
-                    <span>Beginner</span>
-                    <span>4 Weeks</span>
+                    <span>{course?.category}</span>
+                    <span>{course?.duration}</span>
                   </div>
 
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-sm text-slate-700">By John Doe</span>
-                    <div className="flex items-center text-yellow-500 text-sm">
-                      <FaStar className="me-1" /> 4.8
-                    </div>
-                  </div>
+                  <span className="text-cyan-600 font-bold">
+                    $ {course?.price}
+                  </span>
 
                   <button className="w-full mt-4">
                     <Link
@@ -135,7 +146,9 @@ function Home() {
                 </div>
               </div>
             </SwiperSlide>
-          ))}
+          ))
+        :
+        <p className='font-bold my-5 px-10 '>Loading..... </p>}
         </Swiper>
 
       </div>

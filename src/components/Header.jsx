@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { FaAddressCard, FaBars, FaPowerOff, FaSearch } from 'react-icons/fa'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaCircleUser } from "react-icons/fa6";
 import { toast, ToastContainer } from 'react-toastify'
+import { searchContext } from '../contextAPI/ShareContext';
 
 
 function Header() {
   const location = useLocation()
-  const [searchKey,setSearchKey] = useState("")
+  const {searchKey,setSearchKey} = useContext(searchContext)
   const navigate = useNavigate()
 
   const [toggle, setToggle] = useState(false)

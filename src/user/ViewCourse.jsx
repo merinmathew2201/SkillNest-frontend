@@ -1,31 +1,74 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { getPreviewLecturesAPI, getSinglePublishedCourseAPI } from '../services/allAPI'
+import serverURL from '../services/serverURL'
 
 function ViewCourse() {
+  const { courseId } = useParams()
+  const [course, setCourse] = useState({})
+  const [previewLectures, setPreviewLectures] = useState([])
+  console.log(previewLectures);
+  
+
+  useEffect(()=>{
+    fetchCourse()
+    fetchPreviewLectures()
+  },[])
+
+  const fetchCourse = async () => {
+    const token = sessionStorage.getItem("token")
+    const reqHeader = {
+      "Authorization": `Bearer ${token}`
+    }
+    if(token){
+      const result = await getSinglePublishedCourseAPI(courseId,reqHeader)
+      if (result.status === 200) {
+        setCourse(result.data)
+      }else{
+      console.log(result);
+      }
+    }
+  
+  }
+
+  const fetchPreviewLectures = async () => {
+    const token = sessionStorage.getItem("token")
+    const reqHeader = {
+      "Authorization": `Bearer ${token}`
+    }
+    if(token){
+      const result = await getPreviewLecturesAPI(courseId,reqHeader)
+      if (result.status === 200) {
+        setPreviewLectures(result.data)
+      }else{
+      console.log(result);
+      }
+    }
+    
+  }
   return (
     <>
     <Header/>
     <div className="bg-sky-50 py-14 px-6 md:px-20">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-800">
-          Full Stack Web Development
+          {course?.title}
         </h1>
 
         <p className="mt-4 text-slate-600 max-w-3xl">
-          Learn MERN stack from scratch with hands-on projects and real-world
-          development practices.
+          {course?.shortDescription}
         </p>
 
         <div className="flex flex-wrap gap-4 mt-6 text-sm text-slate-600">
           <span className="bg-white px-3 py-1 rounded-full shadow">
-            Beginner
+            {course?.level}
           </span>
           <span className="bg-white px-3 py-1 rounded-full shadow">
-            4 Weeks
+            {course?.duration}
           </span>
           <span className="bg-white px-3 py-1 rounded-full shadow">
-            Web Development
+            {course?.category}
           </span>
         </div>
       </div>
@@ -42,9 +85,7 @@ function ViewCourse() {
               Course Overview
             </h2>
             <p className="text-slate-600 leading-relaxed">
-              This course will guide you through frontend and backend
-              development using modern technologies like React, Node.js,
-              Express, and MongoDB.
+              {course?.overview}
             </p>
           </section>
 
@@ -54,8 +95,7 @@ function ViewCourse() {
               What You'll Learn
             </h2>
             <p className="text-slate-600 leading-relaxed">
-              This course will help you understand the core concepts of web development,
-              build real-world projects, and gain confidence to apply for jobs.
+              {course?.learnings}
             </p>
           </section>
 
@@ -65,11 +105,23 @@ function ViewCourse() {
               Free Preview
             </h2>
 
-            <div className="rounded-xl overflow-hidden shadow">
-              <video controls className="w-full">
-                <source src="/sample-video.mp4" type="video/mp4" />
-              </video>
-            </div>
+            {previewLectures.length > 0 ? (
+              <div className="rounded-xl overflow-hidden shadow">
+                <video controls className="w-full">
+                  <source
+                    src={`${serverURL}/uploads/videos/${previewLectures[0].videoURL}`}
+                    type="video/mp4"
+                  />
+                </video>
+                <p className="text-sm text-slate-600 mt-2 px-2">
+                  {previewLectures[0].title}
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">
+                No preview available for this course
+              </p>
+            )}
 
             <p className="text-sm text-slate-500 mt-2">
               Preview lesson available for everyone
@@ -81,21 +133,17 @@ function ViewCourse() {
         <div className="sticky top-24 h-fit">
           <div className="bg-white rounded-2xl shadow-lg p-6">
             
-            <img
-              src="https://www.creativeinsightacademy.com/static/media/fullStackDevelopment.885c32d4b5d6f021462f.jpg"
-              alt="course"
-              className="rounded-xl mb-4"
-            />
+            <img src={`${serverURL}/uploads/images/${course?.thumbnail}`} alt="course" className="rounded-xl mb-4" />
 
             <div className="space-y-2 text-sm text-slate-600">
-              <p><strong>Level:</strong> Beginner</p>
-              <p><strong>Duration:</strong> 4 Weeks</p>
-              <p><strong>Category:</strong> Web Development</p>
+              <p><strong>Level:</strong> {course?.level}</p>
+              <p><strong>Duration:</strong> {course?.duration}</p>
+              <p><strong>Category:</strong> {course?.category}</p>
             </div>
             {/* Price */}
             <div className="mt-4 border-t border-gray-400 pt-4">
               <p className="text-sm text-slate-500">Course Price</p>
-              <p className="text-2xl font-bold text-slate-800">$49</p>
+              <p className="text-2xl font-bold text-slate-800">$ {course?.price}</p>
             </div>
             <button className="w-full mt-6 py-2 rounded-xl bg-cyan-500 text-white font-medium hover:bg-cyan-600 transition">
               <Link to={'/courses/:id/learn'}>Enroll Now</Link>

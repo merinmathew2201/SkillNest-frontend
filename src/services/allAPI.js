@@ -146,3 +146,23 @@ export const publishCourseAPI = async (courseId, reqHeader) => {
 export const deleteLectureAPI = async (lectureId, reqHeader) => {
   return await commonAPI("DELETE",`${serverURL}/lecture/delete/${lectureId}`,{},reqHeader)
 }
+
+// /courses/home - called by home hwne page loads
+export const getLatestCoursesAPI = async () => {
+  return await commonAPI("GET",`${serverURL}/courses/home`,{})
+}
+
+// /student/courses - called by all courses
+export const getAllPublishedCoursesAPI = async (reqHeader,searchKey)=>{
+    return await commonAPI ("GET",`${serverURL}/student/courses?search=${searchKey}`,{},reqHeader)
+} 
+
+///student/course/:courseId- get single course (student)
+export const getSinglePublishedCourseAPI = async (courseId,reqHeader) => {
+  return await commonAPI("GET",`${serverURL}/student/course/${courseId}`,{},reqHeader)
+}
+
+// /lectures/preview/courseId - get preview lecture
+export const getPreviewLecturesAPI = async (courseId,reqHeader) => {
+  return await commonAPI("GET",`${serverURL}/lectures/preview/${courseId}`,{},reqHeader)
+}
