@@ -1,3 +1,4 @@
-const serverURL = "http://localhost:3000"
+
+const serverURL = "https://skillnest-server-n4x2.onrender.com"
 
 export default serverURL
