@@ -122,9 +122,7 @@ function Home() {
                   <h3 className="font-semibold text-lg text-slate-800">
                     {course?.title}
                   </h3>
-                  <p className="text-sm text-slate-600 mt-1 line-clamp-2">
-                    {course?.shortDescription}
-                  </p>
+                  
 
                   <div className="flex justify-between text-xs text-slate-500 mt-3">
                     <span>{course?.category}</span>
