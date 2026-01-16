@@ -1,18 +1,40 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import EditProfile from './EditProfile'
+import { getEnrolledCoursesAPI } from '../services/allAPI'
 
 function Profile() {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [userDetails,setUserDetails] = useState({})
+
+    const [courses, setCourses] = useState([]);
+    const navigate = useNavigate()
     
     useEffect(()=>{
       if(sessionStorage.getItem("token") && sessionStorage.getItem("user")){
         setUserDetails(JSON.parse(sessionStorage.getItem("user")))
       }
-    },[userDetails])
+      fetchEnrolledCourses()
+    },[])
+
+    const fetchEnrolledCourses = async () => {
+      const token = sessionStorage.getItem("token");
+      if (token) {
+        const reqHeader = {
+          Authorization: `Bearer ${token}`,
+        }
+        const res = await getEnrolledCoursesAPI(reqHeader);
+        if (res.status == 200) {
+          setCourses(res.data);
+        } else {
+          console.log(res);
+        }
+      }
+
+    
+  }
   return (
     <>
     <Header/>
@@ -45,70 +67,35 @@ function Profile() {
         onClose={() => setIsModalOpen(false)}/>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="bg-white p-5 rounded-lg shadow text-center">
-            <h3 className="text-2xl font-bold text-cyan-600">5</h3>
-            <p className="text-slate-600 text-sm">Enrolled Courses</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-lg shadow text-center">
-            <h3 className="text-2xl font-bold text-green-600">2</h3>
-            <p className="text-slate-600 text-sm">Completed Courses</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-lg shadow text-center">
-            <h3 className="text-2xl font-bold text-purple-600">42 hrs</h3>
-            <p className="text-slate-600 text-sm">Learning Hours</p>
-          </div>
-        </div>
+        
 
         {/* My Courses */}
         <div className="mt-10">
-          <h3 className="text-xl font-semibold mb-4">My Courses</h3>
+          <h3 className="text-xl font-semibold mb-4">My Enrolled Courses</h3>
 
           {/* Course Card */}
-          <div className="bg-white p-5 rounded-lg shadow mb-4">
-            <h4 className="font-semibold text-lg">
-              Full Stack Web Development
-            </h4>
-            <p className="text-sm text-slate-600">
-              Instructor: John Doe
-            </p>
-
-            {/* Progress */}
-            <div className="mt-3">
-              <div className="w-full bg-slate-200 h-2 rounded-full">
-                <div className="bg-cyan-500 h-2 rounded-full w-[50%]" />
-              </div>
-              <p className="text-xs text-slate-500 mt-1">50% completed</p>
-            </div>
+          {
+            courses?.length>0?
+            courses?.map(course=>(
+              <div key={course._id} className="bg-white p-5 rounded-lg shadow mb-4">
+                <h4 className="font-semibold text-lg">
+                  {course?.title}
+                </h4>
+                <p className="text-sm text-slate-600">
+                  Instructor : {course?.educatorMail}
+                </p>
 
             <button className="mt-4 px-4 py-2 text-sm bg-cyan-600 text-white rounded hover:bg-cyan-700">
-              <Link to={'/courses/:id/learn'}>Continue Learning</Link>
+              <Link to={`/courses/${course._id}/learn`}>Continue Learning</Link>
             </button>
           </div>
+            ))
+            :
+            <p className='my-5 font-bold text-cyan-900'>You have not enrolled any course yet...</p>
+          }
+          
 
-          {/* Course Card */}
-          <div className="bg-white p-5 rounded-lg shadow">
-            <h4 className="font-semibold text-lg">
-              React for Beginners
-            </h4>
-            <p className="text-sm text-slate-600">
-              Instructor: Jane Smith
-            </p>
-
-            <div className="mt-3">
-              <div className="w-full bg-slate-200 h-2 rounded-full">
-                <div className="bg-green-500 h-2 rounded-full w-full" />
-              </div>
-              <p className="text-xs text-slate-500 mt-1">Completed</p>
-            </div>
-
-            <button className="mt-4 px-4 py-2 text-sm bg-slate-400 text-white rounded cursor-not-allowed">
-              Completed
-            </button>
-          </div>
+          
         </div>
 
         {/* Account Info */}

@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { routeGuardContext } from '../../contextAPI/AuthContext'
 
 function AdminHeader() {
   const navigate = useNavigate()
+  const {role,authorisedUser,setAuthorisedUser} = useContext(routeGuardContext)
 
   const logout = ()=>{
     sessionStorage.clear()
+    setAuthorisedUser(false)
     navigate('/')
   }
 

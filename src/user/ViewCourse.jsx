@@ -2,20 +2,26 @@ import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { Link, useParams } from 'react-router-dom'
-import { getPreviewLecturesAPI, getSinglePublishedCourseAPI } from '../services/allAPI'
+import {  coursePaymentAPI, getEnrolledCoursesAPI, getPreviewLecturesAPI, getSinglePublishedCourseAPI } from '../services/allAPI'
 import serverURL from '../services/serverURL'
+import { loadStripe } from '@stripe/stripe-js'
 
 function ViewCourse() {
   const { courseId } = useParams()
   const [course, setCourse] = useState({})
   const [previewLectures, setPreviewLectures] = useState([])
-  console.log(previewLectures);
+  const [isEnrolled, setIsEnrolled] = useState(false)
+  
   
 
   useEffect(()=>{
-    fetchCourse()
-    fetchPreviewLectures()
-  },[])
+    
+    if(courseId){
+      fetchCourse()
+      fetchPreviewLectures()
+      checkEnrollment()
+    }
+  },[courseId])
 
   const fetchCourse = async () => {
     const token = sessionStorage.getItem("token")
@@ -48,6 +54,42 @@ function ViewCourse() {
     }
     
   }
+
+  const makePayment = async ()=>{
+    const stripe = await loadStripe('pk_test_51Sjz07Abob52Fu02qWgA9zlE79RM8cCDAARYXYl5QYUPGRJfz4KZrdwopbxtuxjr5Fsf6ftHwUdkPHTyBpxU9mPq00txnuPQeM');
+    console.log(stripe);
+    // api call
+    const token = sessionStorage.getItem("token")
+    if(token){
+      const reqHeader = {
+        "Authorization" : `Bearer ${token}`
+      }
+      const result = await coursePaymentAPI(courseId,reqHeader)
+      console.log(result.data);
+      const {checkOutURL} = result.data
+      window.location.href = checkOutURL
+    
+    } 
+  }
+
+  const checkEnrollment = async () => {
+  const token = sessionStorage.getItem("token");
+  if (token) {
+    const reqHeader = { Authorization: `Bearer ${token}` };
+    const result = await getEnrolledCoursesAPI(reqHeader); // Call your controller
+    if (result.status === 200) {
+      // result.data is an array of enrolled courses
+      const enrolledCourse = result.data
+      const enrolledCourseIds = enrolledCourse.map(course => course._id);
+      setIsEnrolled(enrolledCourseIds.includes(courseId));
+      
+    }else{
+      console.log(result);
+      
+    }
+  }
+}
+  
   return (
     <>
     <Header/>
@@ -145,9 +187,18 @@ function ViewCourse() {
               <p className="text-sm text-slate-500">Course Price</p>
               <p className="text-2xl font-bold text-slate-800">$ {course?.price}</p>
             </div>
-            <button className="w-full mt-6 py-2 rounded-xl bg-cyan-500 text-white font-medium hover:bg-cyan-600 transition">
-              <Link to={'/courses/:id/learn'}>Enroll Now</Link>
-            </button>
+            
+            
+              {isEnrolled ? (
+                <button disabled className="bg-green-600 text-white px-4 py-2 rounded mt-4">
+                  Enrolled ✅
+                </button>
+              ) : (
+                <button onClick={makePayment} className="bg-cyan-600 text-white px-4 py-2 rounded mt-4">
+                  Enroll Now
+                </button>
+              )}
+           
           </div>
         </div>
       </div>

@@ -166,3 +166,20 @@ export const getSinglePublishedCourseAPI = async (courseId,reqHeader) => {
 export const getPreviewLecturesAPI = async (courseId,reqHeader) => {
   return await commonAPI("GET",`${serverURL}/lectures/preview/${courseId}`,{},reqHeader)
 }
+
+// /course/courseId/enroll - clicked on enroll brn
+export const coursePaymentAPI = async (courseId, reqHeader) => {
+  return await commonAPI("POST",`${serverURL}/course/${courseId}/enroll`,{},reqHeader)
+}
+
+// ENROLL COURSE AFTER PAYMENT SUCCESS
+export const enrollCourseAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST",`${serverURL}/course/enroll/success`,reqBody,reqHeader)
+}
+
+// student enrolled course
+export const getEnrolledCoursesAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${serverURL}/student/enrolled-courses`, {}, reqHeader);
+}
+
+

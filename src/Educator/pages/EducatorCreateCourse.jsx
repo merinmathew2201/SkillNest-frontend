@@ -3,8 +3,10 @@ import EducatorHeader from '../components/EducatorHeader'
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { toast, ToastContainer } from 'react-toastify';
 import { createCourseAPI } from '../../services/allAPI';
+import { useNavigate } from 'react-router-dom';
 
 function EducatorCreateCourse() {
+    const navigate = useNavigate()
     const [courseData,setCourseData] = useState({
         title: "",shortDescription: "",overview: "",learnings: "",category: "",level: "",duration: "",thumbnail:"",price: ""
     })
@@ -38,6 +40,9 @@ function EducatorCreateCourse() {
                 const result = await createCourseAPI(reqBody,reqHeader)
                 if(result.status == 201){
                     toast.success("Course Created successfully....")
+                    setTimeout(() => {
+                        navigate('/educator/courses')
+                    }, 2000);
                     
                 }else if(result.status == 409){
                     toast.warning(result.response.data)

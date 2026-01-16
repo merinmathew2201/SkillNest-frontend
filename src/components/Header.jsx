@@ -4,9 +4,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaCircleUser } from "react-icons/fa6";
 import { toast, ToastContainer } from 'react-toastify'
 import { searchContext } from '../contextAPI/ShareContext';
+import { routeGuardContext } from '../contextAPI/AuthContext';
 
 
 function Header() {
+  const {role,authorisedUser,setAuthorisedUser} = useContext(routeGuardContext)
   const location = useLocation()
   const {searchKey,setSearchKey} = useContext(searchContext)
   const navigate = useNavigate()
@@ -43,6 +45,7 @@ function Header() {
 
   const logout = ()=>{
     sessionStorage.clear()
+    setAuthorisedUser(false)
     setToken("")
     setDp("")
     setDropdown(false)

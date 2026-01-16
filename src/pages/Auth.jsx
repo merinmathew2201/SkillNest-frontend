@@ -1,5 +1,5 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -7,9 +7,11 @@ import { toast, ToastContainer } from 'react-toastify'
 import { googleLoginAPI, loginAPI, registerAPI } from '../services/allAPI'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
+import { routeGuardContext } from '../contextAPI/AuthContext'
 
 
 function Auth({registerURL}) {
+  const {role,authorisedUser,setAuthorisedUser} = useContext(routeGuardContext)
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -32,6 +34,7 @@ function Auth({registerURL}) {
         sessionStorage.setItem("token",result.data.token)
         sessionStorage.setItem("user",JSON.stringify(result.data.user))
         toast.success("Login Successfull!!!")
+        setAuthorisedUser(true)
         setTimeout(() => {
           navigate("/")
         }, 2000)
@@ -84,6 +87,7 @@ function Auth({registerURL}) {
                 if(result.status == 200){
                   sessionStorage.setItem("token",result.data.token)
                   sessionStorage.setItem("user",JSON.stringify(result.data.user))
+                  setAuthorisedUser(true)
                   toast.success("Login Successfull!!!")
                   setTimeout(() => {
                     if(result.data.user.role == "admin"){

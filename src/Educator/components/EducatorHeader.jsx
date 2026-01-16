@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import EducatorProfileEdit from './EducatorProfileEdit'
+import { routeGuardContext } from '../../contextAPI/AuthContext'
 
 function EducatorHeader() {
+  const {role,authorisedUser,setAuthorisedUser} = useContext(routeGuardContext)
   const [showModal, setShowModal] = useState(false)
   const navigate = useNavigate()
 
   const logout = ()=>{
     sessionStorage.clear()
+    setAuthorisedUser(false)
     navigate('/')
   }
   return (
